@@ -40,7 +40,7 @@ class Remote:
         print(title)
         for byte in frame:
             print "0x%0.2X" % byte,
-        print("\n")
+        print("")
 
     def send_signal(self, button, repetition=2, TXGPIO=4):
         frame = bytearray(7)
