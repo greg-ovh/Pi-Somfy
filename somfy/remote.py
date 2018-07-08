@@ -19,7 +19,7 @@ class Remote:
     def __init__(self, name):
 
         self.__name = name
-        self.__id = random.randint(0, 1677215)
+        self.__id = random.randint(0, 2**(3*8)-1)  # 2 power 3 bytes times 8 bit minus 1
         self.__roll = 1
 
         if not os.path.isdir('remotes'):
@@ -29,17 +29,17 @@ class Remote:
             file = open('remotes/'+self.__name+'.json', 'r')
             try:
                 remotecfg = json.loads(file.read())
-                self.__id = remotecfg['id']
+                self.__id = int(remotecfg['id'], 16)
                 self.__roll = remotecfg['roll']
             except Exception as e:
                 print(repr(e))
             file.close()
 
     @staticmethod
-    def display_frame(frame, title):
-        print(title,)
+    def display_frame(title, frame):
+        print(title)
         for byte in frame:
-            print("0x%0.2X " % byte, )
+            print "0x%0.2X" % byte,
         print("\n")
 
     def send_signal(self, button, repetition=2, TXGPIO=4):
@@ -67,7 +67,7 @@ class Remote:
         pi.set_mode(TXGPIO, pigpio.OUTPUT)
 
         if Remote.DEBUG:
-                print("Remote  :      " + "0x%0.2X" % hex(self.__id))
+                print("Remote  :      " + "0x%0.2X" % self.__id)
                 print("Button  :      " + "0x%0.2X" % button)
                 print("Rolling code : " + str(self.__roll)+"\n")
 
@@ -89,7 +89,7 @@ class Remote:
         frame[1] |= checksum
 
         if Remote.DEBUG:
-                Remote.display_frame("Frame with checksum :    ", frame)      
+                Remote.display_frame("Frame with checksum :    ", frame)
 
         for i in range(1, 7):
             frame[i] ^= frame[i-1];
